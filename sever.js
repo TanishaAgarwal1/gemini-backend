@@ -1,33 +1,41 @@
 
 
 import express from 'express';
-const app = express();
+//const app = express();
+import mongoose from 'mongoose';
+import cookieParser from "cookie-parser";
+import {app,server} from './socket/socket.js'
+
+import authRoutes from "./Routes/auth.js"
+import messageRoutes from "./Routes/message.js"
+import userRoutes from "./Routes/user.js";
+import dotenv from 'dotenv';
+dotenv.config();
+
+app.use(express.json());// bcoz req.body is null by default toh usse chnage krne k liye
+app.use(cookieParser());
+
+
+mongoose.connect(process.env.MONGO_URL).then(() => {
+    console.log("db Connected");
+});
 //const fun = require('./api');
-import run from './api.js';
+
 import cors from 'cors'
+import routes from "./Routes/Basic.js";
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
-
-
-app.post("/suitabilityAssesment", async (req, res) => {
-
-
-
-    const prompt = req.body.msg;
-    console.log(req.body);
-
-    const output = await run(prompt);
-    res.send(output);
+app.use("/api/auth",authRoutes);
+app.use("/api/messages",messageRoutes);
+app.use("/api/users", userRoutes);
+app.use(routes);
 
 
 
 
 
 
-})
-
-app.listen(8000, () => {
-    console.log("setver started, Have A good Day");
+server.listen(8000, () => {
+    console.log("server started, Have A good Day");
 })
